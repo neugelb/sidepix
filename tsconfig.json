@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-base.json",
+  "compilerOptions": {
+    "rootDir": "./lib",
+    "outDir": "./dist/esm",
+    "module": "es6"
+  },
+  "include": ["./lib"],
+  "exclude": ["./lib/react"]
+}
