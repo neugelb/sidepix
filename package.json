@@ -9,7 +9,7 @@
     "format": "prettier --write lib/**/* tests/**/* examples/**/*",
     "build:esm": "tsc",
     "build:cjs": "tsc -p tsconfig-cjs.json",
-    "copy-subpackages": "shx cp -r package.json subpackages/* dist",
+    "copy-subpackages": "shx cp -r package.json README.md subpackages/* dist",
     "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn copy-subpackages",
     "clean": "shx rm -rf dist",
     "test:clean": "shx rm -rf tests/dist",
