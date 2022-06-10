@@ -4,6 +4,7 @@ import {
   PictureConfReact,
   ServerSideConfReact,
 } from './common';
+export { PictureConfReact } from './common';
 
 export function makePicture(conf: PictureConfReact): PictureComponent;
 export function makePicture(
