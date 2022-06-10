@@ -1,7 +1,21 @@
 {
   "name": "sidepix",
   "version": "0.1.1",
-  "license": "MIT",
+  "author": "Dario Aprea <dario@neugelb.com>",
+  "description": "<picture> component with image processing as side-effect",
+  "license": "ISC",
+  "repository": {
+    "url": "https://github.com/neugelb/sidepix"
+  },
+  "keywords": [
+    "image",
+    "picture",
+    "optimization",
+    "react",
+    "react-component",
+    "next",
+    "sharp"
+  ],
   "main": "cjs/index.js",
   "module": "esm/index.js",
   "scripts": {
