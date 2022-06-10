@@ -1,6 +1,6 @@
 {
   "name": "sidepix",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "main": "cjs/index.js",
   "module": "esm/index.js",
@@ -12,12 +12,11 @@
     "copy-subpackages": "shx cp -r package.json subpackages/* dist",
     "build": "yarn clean && yarn build:esm && yarn build:cjs && yarn copy-subpackages",
     "clean": "shx rm -rf dist",
-    "watch": "tsc -w & tsc -w",
-    "pipeline:publish": "npm publish",
     "test:clean": "shx rm -rf tests/dist",
     "test:build": "tsc -p tests/tsconfig.json",
     "test:run": "tape tests/dist/tests/*.js",
-    "test": "yarn test:clean && yarn test:build && yarn test:run"
+    "test": "yarn test:clean && yarn test:build && yarn test:run",
+    "npm-publish": "cd dist && npm adduser && npm publish"
   },
   "bin": {
     "sidepix-wait": "cjs/bin/sidepix-wait.js"
