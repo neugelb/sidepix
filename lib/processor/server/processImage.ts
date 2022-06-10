@@ -123,9 +123,7 @@ export async function processImage(
               : s3.toFormat(sharp.format[f], formatOptions);
 
           converted.on('error', (err) => {
-            conf.logger?.error(
-              `Error on sharp converted (${src}): ${String(err)}`,
-            );
+            conf.logger?.error(`Error on sharp converted (${src}):`, err);
           });
 
           const createFileName = conf.createFileName ?? defaultCreateFileName;
@@ -188,7 +186,7 @@ function removeImagesFromSource(
   return (err: any) => {
     if (!isUpstreamError(err)) {
       getProcessedFilePaths(conf, sources, src).forEach((filePath) => {
-        conf.logger?.error(`Error on sharp stream ${filePath}: ${String(err)}`);
+        conf.logger?.error(`Error on sharp stream ${filePath}:`, err);
         imageRemoved(filePath);
       });
     }
