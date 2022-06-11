@@ -5,7 +5,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## How to run
 
 Export the site and serve it:
-```sh
+```
 $ yarn export && yarn serve
 ```
 
@@ -15,7 +15,7 @@ There are two pages:
 - `next/image` example: [http://localhost:8080/next-image](http://localhost:8080/next-image)
 
 Images will be processed in development mode, too. Just reload until they're generated and cached.
-```sh
+```
 $ yarn dev
 ```
 

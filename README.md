@@ -18,8 +18,8 @@
 
 ## Quick start
 
-```sh
-$ yarn install sidepix
+```
+$ yarn add sidepix
 ```
 
 See the [Next.js example](/examples/nextjs).
@@ -174,3 +174,13 @@ This is also useful to add render time optimization to next/image ([see example]
 ## Is this stable?
 
 We're using a version of this at Neugelb in production, so we can testify to the soundness of the concept. However this is a substantial rewrite and an early release, so expect bugs and API changes.
+
+## Troubleshooting
+
+To understand what's going on with the processing server you can launch it from a separate terminal:
+
+```
+$ yarn sidepix-start
+```
+
+Your app will find this server and connect to it.
