@@ -8,6 +8,7 @@ ipc.config.socketRoot = ipcSocketRoot;
 ipc.config.appspace = ipcAppSpace;
 ipc.config.id = ipcChannelId;
 ipc.config.retry = 1500;
+ipc.config.unlink = false;
 
 const socketFile = ipc.config.socketRoot + ipc.config.appspace + ipc.config.id;
 
@@ -17,10 +18,18 @@ stat(socketFile, function (err) {
   } else if (err.code === 'ENOENT') {
     ipc.serve(ipcHandleRequests);
 
-    ipc.server.on('destroy', () =>
-      process.exit(ServerExitCode.SocketDestroyed),
-    );
-    ipc.server.on('error', () => process.exit(ServerExitCode.Generic));
+    ipc.server.on('destroy', () => {
+      console.log('ipc.serve.on destroy');
+      process.exit(ServerExitCode.SocketDestroyed);
+    });
+    ipc.server.on('error', (err) => {
+      console.log('ipc.serve.on error', err);
+      if (err.code === 'EADDRINUSE' || err.code === 'EEXISTS') {
+        process.exit(ServerExitCode.AlreadyRunning);
+      } else {
+        process.exit(ServerExitCode.Generic);
+      }
+    });
 
     ipc.server.start();
 
@@ -32,8 +41,9 @@ stat(socketFile, function (err) {
   }
 });
 
-process.on('exit', (error: ServerExitCode) => {
-  if (ipc.server) {
+process.on('exit', (exitCode: ServerExitCode) => {
+  console.log('server process exit', exitCode);
+  if (exitCode !== ServerExitCode.AlreadyRunning && ipc.server) {
     ipc.server.stop();
   }
 });

@@ -1,18 +1,24 @@
 import { spawn } from 'child_process';
 import { resolve } from 'path';
 import { ServerError, ServerExitCode } from '../server';
-import { connectToImageProcessor } from './sendMessages';
-import { executeQuittingCallbacks } from './sendMessages';
+import {
+  connectToImageProcessor,
+  executeQuittingCallbacks,
+} from './sendMessages';
 
 let serverPromise: Promise<void> | undefined;
 
-export async function launchServerProcess(): Promise<void> {
+export async function launchServerProcess(
+  { detached }: { detached: boolean } = { detached: false },
+): Promise<void> {
   if (serverPromise !== undefined) {
     return serverPromise;
   } else {
     serverPromise = new Promise((res, rej) => {
       const onServerReady = () => {
-        childProcess.unref();
+        if (detached) {
+          childProcess.unref();
+        }
         connectToImageProcessor();
         res();
       };
@@ -20,10 +26,12 @@ export async function launchServerProcess(): Promise<void> {
       const childProcess = spawn(
         'node',
         [resolve(__dirname, '../server/server.js')],
-        {
-          detached: true,
-          stdio: 'ignore',
-        },
+        detached
+          ? {
+              detached: true,
+              stdio: 'ignore',
+            }
+          : {},
       )
         .on('error', (err) => {
           rej(err);
@@ -31,6 +39,7 @@ export async function launchServerProcess(): Promise<void> {
         .on('exit', async (code, signal) => {
           serverPromise = undefined;
           if (code !== ServerExitCode.AlreadyRunning) {
+            console.log('lauchServer unknown error', code);
             rej(new ServerError(code));
           } else {
             onServerReady();
@@ -41,6 +50,9 @@ export async function launchServerProcess(): Promise<void> {
         });
 
       process.on('SIGUSR2', onServerReady);
+
+      childProcess.stdout?.on('data', (d) => console.log(String(d)));
+      childProcess.stderr?.on('data', (d) => console.log(String(d)));
     });
     return serverPromise;
   }

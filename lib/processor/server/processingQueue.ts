@@ -44,18 +44,4 @@ async function processQueue(conf: ServerSideConf): Promise<void> {
     await connect(sourceStream, processingStreams, true);
   }
   queue.isProcessing = false;
-
-  while (queueEmptyCallbacks.length > 0) {
-    queueEmptyCallbacks.shift()?.();
-  }
-}
-
-const queueEmptyCallbacks: (() => void)[] = [];
-
-export function waitQueueEmpty(): Promise<void> {
-  if (size(queue.streams) === 0) {
-    return Promise.resolve();
-  } else {
-    return new Promise((res) => queueEmptyCallbacks.push(res));
-  }
 }

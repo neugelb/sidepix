@@ -1,10 +1,14 @@
-import { ValueReference, isServersideConf } from '.';
-import { withImageProcessing } from '../processor';
-import { PictureConf, ServerSideConf } from './PictureConf';
+import {
+  ValueReference,
+  isServersideConf,
+  PictureConf,
+  ServerSideConf,
+} from '../../core';
+import { withImageProcessing } from './withImageProcessing';
 import {
   GetPictureData,
   makeGetPictureData as makeGetPictureDataClient,
-} from './getPictureDataClientSide';
+} from '../../core/getPictureDataClientSide';
 
 export function makeGetPictureData(conf: PictureConf): GetPictureData;
 export function makeGetPictureData(

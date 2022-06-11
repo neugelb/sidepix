@@ -2,7 +2,12 @@ import { PictureProps, ValueReference } from '../../core';
 import ipc from 'node-ipc';
 import { launchServerProcess } from './launchServerProcess';
 import { IpcServerMessages } from '../server';
-import { ipcAppSpace, ipcChannelId } from '../utils';
+import {
+  executeCallbacks,
+  executeConditionalCallbacks,
+  ipcAppSpace,
+  ipcChannelId,
+} from '../utils';
 
 ipc.config.appspace = ipcAppSpace;
 
@@ -22,7 +27,7 @@ async function ipcSend<
   ActionT extends keyof IpcClientMessages,
   MessageT extends IpcClientMessages[ActionT],
 >(action: ActionT, args: MessageT): Promise<void> {
-  await launchServerProcess();
+  await launchServerProcess({ detached: true });
   ipc.of[ipcChannelId].emit(action, args);
 }
 
@@ -40,31 +45,17 @@ export function connectToImageProcessor(): Promise<void> {
     return new Promise((res, rej) => {
       ipc.connectTo(ipcChannelId, () => {
         ipc.of[ipcChannelId].on('connect', res);
-        console.log(
-          'connected to',
-          ipcChannelId,
-          ipc.of[ipcChannelId] !== undefined,
-        );
-        // ipc.of[ipcChannelId].on('connect', () => {
-        //   console.log('connect', ipcChannelId);
-        //   res();
-        // });
+
+        console.log('sidepix - connected to', ipcChannelId);
+
         ipc.of[ipcChannelId].on('disconnect', () => {
           ipc.disconnect(ipcChannelId);
         });
-        // ipc.of[ipcChannelId].on('destroy', () => {
-        //   console.log('destroy', ipcChannelId);
-        //   // delete ipc.of[ipcChannelId];
-        //   ipc.disconnect(ipcChannelId);
-        // });
-        // ipc.of[ipcChannelId].on('error', (err) => {
-        //   console.log('error', ipcChannelId, err);
-        //   // delete ipc.of[ipcChannelId];
-        //   ipc.disconnect(ipcChannelId);
-        // });
 
-        ipcReceive('imageReady', executeImageReadyCallbacks);
-        ipcReceive('queueEmpty', executeQueueEmptyCallbacks);
+        ipcReceive('imageReady', (args) =>
+          executeConditionalCallbacks(imageReadyCallbacks, args),
+        );
+        ipcReceive('queueEmpty', () => executeCallbacks(queueEmptyCallbacks));
       });
     });
   } else {
@@ -87,30 +78,8 @@ const queueEmptyCallbacks: (() => void)[] = [];
 
 const quittingCallbacks: (() => void)[] = [];
 
-export function executeImageReadyCallbacks(
-  args: IpcServerMessages['imageReady'],
-): void {
-  let i = 0;
-  while (i < imageReadyCallbacks.length) {
-    const cb = imageReadyCallbacks[i];
-    if (cb(args)) {
-      imageReadyCallbacks.splice(i, 1);
-    } else {
-      i++;
-    }
-  }
-}
-
-export function executeQueueEmptyCallbacks() {
-  while (queueEmptyCallbacks.length > 0) {
-    queueEmptyCallbacks.shift()?.();
-  }
-}
-
 export function executeQuittingCallbacks() {
-  while (quittingCallbacks.length > 0) {
-    quittingCallbacks.shift()?.();
-  }
+  executeCallbacks(quittingCallbacks);
 }
 
 export async function waitImageReady(filePath: string): Promise<void> {

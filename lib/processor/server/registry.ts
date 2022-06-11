@@ -1,6 +1,8 @@
 import { promises } from 'fs';
 import { isObjectLike } from '../../core';
 import { dirname } from 'path';
+import values from 'lodash/values';
+import { executeCallbacks, executeConditionalCallbacks } from '../utils';
 
 export type ImageStatus = 'processing' | 'ready' | 'absent';
 
@@ -71,6 +73,8 @@ export async function processingImageStarted(imagePath: string) {
       throw new ImageStatusConflictError(registry[imagePath].status);
     }
   }
+
+  executeConditionalCallbacks(updatedCallbacks, undefined);
 }
 
 export async function processingImageCompleted(imagePath: string) {
@@ -84,11 +88,16 @@ export async function processingImageCompleted(imagePath: string) {
   record.readyCallbacks.forEach((cb) => cb());
   record.readyCallbacks = [];
   record.status = 'ready';
+
+  executeConditionalCallbacks(updatedCallbacks, undefined);
 }
 
 export async function imageRemoved(imagePath: string) {
-  registry[imagePath]?.removedCallbacks.forEach((cb) => cb());
+  const callbacks = registry[imagePath]?.removedCallbacks ?? [];
+  executeCallbacks(callbacks);
   delete registry[imagePath];
+
+  executeConditionalCallbacks(updatedCallbacks, undefined);
 }
 
 export async function waitUntilReady(imagePath: string): Promise<void> {
@@ -107,4 +116,27 @@ export async function waitUntilReady(imagePath: string): Promise<void> {
       });
     }
   });
+}
+
+const updatedCallbacks: (() => boolean)[] = [];
+
+function allReady(): boolean {
+  return values(registry).every(({ status }) => status === 'ready');
+}
+
+export function waitUntilAllReady(): Promise<void> {
+  if (allReady()) {
+    return Promise.resolve();
+  } else {
+    return new Promise((res) =>
+      updatedCallbacks.push(() => {
+        if (allReady()) {
+          res();
+          return true;
+        } else {
+          return false;
+        }
+      }),
+    );
+  }
 }

@@ -4,9 +4,8 @@ import { IpcClientMessages } from '../client';
 import { processImage } from './processImage';
 import { ServerSideConf, ValueReference } from '../../core';
 import { requireValue } from '../utils';
-import { waitUntilReady } from './registry';
+import { waitUntilReady, waitUntilAllReady } from './registry';
 import { imageStatusUpdate, queueEmpty } from './sendMessages';
-import { waitQueueEmpty } from './processingQueue';
 
 export function ipcReceiveRequest<
   ActionT extends keyof IpcClientMessages,
@@ -44,7 +43,7 @@ export function ipcHandleRequests() {
   });
 
   ipcReceiveRequest('waitQueueEmpty', async ({}, socket) => {
-    await waitQueueEmpty();
+    await waitUntilAllReady();
     queueEmpty(socket);
   });
 

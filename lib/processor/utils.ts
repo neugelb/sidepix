@@ -8,3 +8,24 @@ export function requireValue<T>({ filePath, name }: ValueReference): T {
   const whole = require(filePath);
   return name !== undefined ? whole[name] : whole;
 }
+
+export function executeConditionalCallbacks<ArgT>(
+  callbacks: ((arg: ArgT) => boolean)[],
+  arg: ArgT,
+): void {
+  let i = 0;
+  while (i < callbacks.length) {
+    const cb = callbacks[i];
+    if (cb(arg)) {
+      callbacks.splice(i, 1);
+    } else {
+      i++;
+    }
+  }
+}
+
+export function executeCallbacks(callbacks: (() => void)[]): void {
+  while (callbacks.length > 0) {
+    callbacks.shift()?.();
+  }
+}
