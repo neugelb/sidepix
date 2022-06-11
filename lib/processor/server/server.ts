@@ -3,7 +3,6 @@ import { stat } from 'fs';
 import { ServerExitCode } from './ServerError';
 import { ipcHandleRequests } from './handleRequests';
 import { ipcAppSpace, ipcChannelId, ipcSocketRoot } from '../utils';
-import { appendFileSync } from 'fs';
 
 ipc.config.socketRoot = ipcSocketRoot;
 ipc.config.appspace = ipcAppSpace;
@@ -28,10 +27,6 @@ stat(socketFile, function (err) {
       if (err.code === 'EADDRINUSE' || err.code === 'EEXIST') {
         process.exit(ServerExitCode.AlreadyRunning);
       } else {
-        appendFileSync(
-          '/tmp/sidepix-log',
-          'unknown error A ' + JSON.stringify(err) + '\n',
-        );
         process.exit(ServerExitCode.Generic);
       }
     });
@@ -42,10 +37,6 @@ stat(socketFile, function (err) {
       process.kill(process.ppid, 'SIGUSR2');
     });
   } else {
-    appendFileSync(
-      '/tmp/sidepix-log',
-      'unknown error B ' + JSON.stringify(err) + '\n',
-    );
     process.exit(ServerExitCode.Generic);
   }
 });
