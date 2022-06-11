@@ -14,6 +14,7 @@
 - Supports third-party image optimization services
 - UI library- and framework-agnostic
 - React component included
+- Works well with next/image
 
 ## Quick start
 
@@ -21,7 +22,7 @@
 $ yarn install sidepix
 ```
 
-See the [Next.js example](/examples/nextjs/README.md).
+See the [Next.js example](/examples/nextjs).
 
 ### Create/configure a component
 
@@ -90,9 +91,9 @@ export const Picture = makePicture(pictureConf, pictureConfRef);
       },
     },
     // base for all the above, generates 400w (JPEG and WEBP)
-    // also generates JPEG the fallback <img>
+    // also generates the fallback <img>
     default: {
-      src: 'pexels-carlos-spitzer-17811.jpg',
+      src: 'example.jpg',
       aspectRatio: 1,
       focalPoint: [0.46, 0.14],
       widths: [400],
@@ -107,14 +108,34 @@ export const Picture = makePicture(pictureConf, pictureConfRef);
 The following HTML will be rendered:
 ```html
 <picture>
-  <source media="(min-width: 840px)" srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_2_800.webp 800w, media/pexels-carlos-spitzer-17811.jpg_46-14_2_1200.webp 1200w" sizes="(min-width: 1240px) 1200px,
-800px" type="image/webp">
-  <source media="(min-width: 840px)" srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_2_800.jpeg 800w, media/pexels-carlos-spitzer-17811.jpg_46-14_2_1200.jpeg 1200w" sizes="(min-width: 1240px) 1200px,
-800px" type="image/jpeg">
-  <source media="(min-width: 640px)" srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_2by3_600.webp 600w" sizes="600px" type="image/webp">
-  <source media="(min-width: 640px)" srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_2by3_600.jpeg 600w" sizes="600px" type="image/jpeg">
-  <source srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_1_400.webp 400w" sizes="400px" type="image/webp"><source srcset="media/pexels-carlos-spitzer-17811.jpg_46-14_1_400.jpeg 400w" sizes="400px" type="image/jpeg">
-  <img src="media/pexels-carlos-spitzer-17811.jpg_400.jpeg">
+  <source
+    media="(min-width: 840px)"
+    srcset="media/example.jpg_46-14_2_800.webp 800w, media/example.jpg_46-14_2_1200.webp 1200w"
+    sizes="(min-width: 1240px) 1200px,800px" 
+    type="image/webp">
+  <source
+    media="(min-width: 840px)"
+    srcset="media/example.jpg_46-14_2_800.jpeg 800w, media/example.jpg_46-14_2_1200.jpeg 1200w"
+    sizes="(min-width: 1240px) 1200px,800px"
+    type="image/jpeg">
+  <source
+    media="(min-width: 640px)"
+    srcset="media/example.jpg_46-14_2by3_600.webp 600w"
+    sizes="600px" type="image/webp">
+  <source
+    media="(min-width: 640px)"
+    srcset="media/example.jpg_46-14_2by3_600.jpeg 600w"
+    sizes="600px"
+    type="image/jpeg">
+  <source
+    srcset="media/example.jpg_46-14_1_400.webp 400w"
+    sizes="400px"
+    type="image/webp">
+  <source
+    srcset="media/example.jpg_46-14_1_400.jpeg 400w"
+    sizes="400px"
+    type="image/jpeg">
+  <img src="media/example.jpg_400.jpeg">
 </picture>
 ```
 
@@ -147,6 +168,8 @@ If you find yourself rendering a sidepix component just for generating images, b
 ```typescript
 export const getPictureData = makeGetPictureData(pictureConf, pictureConfRef);
 ```
+
+This is also useful to add render time optimization to next/image ([see example](/examples/nextjs)).
 
 ## Is this stable?
 

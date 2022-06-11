@@ -1,8 +1,10 @@
 import {
   ServerSideConf,
-  defaultCreateFileName,
   ImageFormat,
   FetchImage,
+  CreateFileName,
+  formatToExtension,
+  extensionToFormat,
 } from 'sidepix';
 
 const fetch: FetchImage =
@@ -48,6 +50,23 @@ export const pictureConf: ServerSideConf = {
       default:
         return format;
     }
+  },
+  logger: console,
+};
+
+export const createFileName: CreateFileName = ({ src, width }) => {
+  const [base, ext] = src.split('.');
+  const extension = formatToExtension(extensionToFormat(`.${ext}`));
+  return base + (width !== undefined ? '_' + width : '') + extension;
+};
+
+export const imageConf: ServerSideConf = {
+  assetsBaseUrl: 'media',
+  createFileName,
+  serverSideProcessor: {
+    fetch,
+    originalDir: 'image-cache',
+    processedDir: 'public/media',
   },
   logger: console,
 };

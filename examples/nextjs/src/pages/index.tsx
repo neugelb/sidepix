@@ -1,19 +1,18 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { Picture } from '../components/Picture';
-import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>Standalone Picture Demo</title>
+        <title>sidepix Next.js SSG example</title>
         <meta name="description" content="<picture>" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <h1>sidepix Next.js example</h1>
+      <main>
+        <h1>sidepix Next.js SSG example</h1>
 
         <h2>One source, different aspect ratios:</h2>
 
@@ -44,6 +43,7 @@ const Home: NextPage = () => {
               },
             },
           }}
+          alt="Black and Green Toucan on Tree Branch"
         />
 
         <p>
@@ -82,6 +82,7 @@ const Home: NextPage = () => {
               },
             },
           }}
+          alt="Scarlet Macaw"
         />
 
         <p>
@@ -101,6 +102,7 @@ const Home: NextPage = () => {
               src: 'Duvor.gif',
             },
           }}
+          alt="Flock"
         />
 
         <p>

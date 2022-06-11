@@ -1,10 +1,29 @@
 # Next.js SSG example
 
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), with a couple of modifications to make **sidepix** work.
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app), with a couple of modifications to make sidepix work.
 
-## Make `PictureConf` available to the processing server
+## How to run
 
-**sidepix**'s optimization server needs to import a `PictureConf` object at runtime, so we have to compile it separately from Next.js's bundles.
+Export the site and serve it:
+```sh
+$ yarn export && yarn serve
+```
+
+There are two pages:
+
+- `<picture>` example: [http://localhost:8080](http://localhost:8080)
+- `next/image` example: [http://localhost:8080/next-image](http://localhost:8080/next-image)
+
+Images will be processed in development mode, too. Just reload until they're generated and cached.
+```sh
+$ yarn dev
+```
+
+## Notable configuration
+
+### Make `PictureConf` available to the processing server
+
+sidepix's optimization server needs to import a `PictureConf` object at runtime, so we have to compile it separately from Next.js's bundles.
 
 In `package.json`:
 ```json
@@ -12,7 +31,7 @@ In `package.json`:
 "build": "yarn build-conf && next build",
 ```
 
-## Strip Node.js code from the frontend bundle
+### Strip Node.js code from the frontend bundle
 
 In `next.config.js`:
 ```typescript
@@ -26,7 +45,7 @@ webpack: (config, { defaultLoaders }) => {
 },
 ```
 
-## Wait for optimization jobs to complete before exporting
+### Wait for optimization jobs to complete before exporting
 
 In `package.json`:
 ```json
