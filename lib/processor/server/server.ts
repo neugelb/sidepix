@@ -41,9 +41,17 @@ stat(socketFile, function (err) {
   }
 });
 
-process.on('exit', (exitCode: ServerExitCode) => {
+function cleanUp(exitCode: ServerExitCode) {
   console.log('server process exit', exitCode);
   if (exitCode !== ServerExitCode.AlreadyRunning && ipc.server) {
     ipc.server.stop();
   }
+}
+
+process.on('exit', cleanUp);
+process.on('SIGINT', () => {
+  cleanUp(ServerExitCode.SigInt);
+});
+process.on('SIGTERM', () => {
+  cleanUp(ServerExitCode.SigTerm);
 });

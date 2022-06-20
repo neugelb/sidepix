@@ -1,6 +1,7 @@
 import { spawn } from 'child_process';
 import { resolve } from 'path';
-import { ServerError, ServerExitCode } from '../server';
+import { ServerError, serverErrorMessage, ServerExitCode } from '../server';
+import { ipcAppSpace, ipcChannelId, ipcSocketRoot } from '../utils';
 import {
   connectToImageProcessor,
   executeQuittingCallbacks,
@@ -9,14 +10,14 @@ import {
 let serverPromise: Promise<void> | undefined;
 
 export async function launchServerProcess(
-  { detached }: { detached: boolean } = { detached: false },
+  options: { detached: boolean } = { detached: false },
 ): Promise<void> {
   if (serverPromise !== undefined) {
     return serverPromise;
   } else {
     serverPromise = new Promise((res, rej) => {
       const onServerReady = () => {
-        if (detached) {
+        if (options.detached) {
           childProcess.unref();
         }
         connectToImageProcessor();
@@ -26,7 +27,7 @@ export async function launchServerProcess(
       const childProcess = spawn(
         'node',
         [resolve(__dirname, '../server/server.js')],
-        detached
+        options.detached
           ? {
               detached: true,
               stdio: 'ignore',
@@ -38,11 +39,22 @@ export async function launchServerProcess(
         })
         .on('exit', async (code, signal) => {
           serverPromise = undefined;
-          if (code !== ServerExitCode.AlreadyRunning) {
-            console.log('lauchServer unknown error', code);
-            rej(new ServerError(code));
-          } else {
+          if (code === ServerExitCode.AlreadyRunning && options.detached) {
             onServerReady();
+          } else if (code !== ServerExitCode.Success) {
+            if (code === ServerExitCode.AlreadyRunning) {
+              const socketFile = ipcSocketRoot + ipcAppSpace + ipcChannelId;
+              console.error(
+                `There seems to be another image processing server running. You may want to delete the socket file ${socketFile}`,
+              );
+            } else {
+              console.error(
+                `launchServer unexpected error ${code}: ${serverErrorMessage(
+                  code,
+                )}`,
+              );
+            }
+            rej(new ServerError(code));
           }
         })
         .on('close', async () => {
