@@ -7,6 +7,7 @@ import {
   ServerSideConf,
   ValueReference,
 } from './core';
+import type { WaitImage } from './processor/server/waitImage';
 
 export function makeGetPictureData(conf: PictureConf): GetPictureData;
 export function makeGetPictureData(
@@ -21,3 +22,8 @@ export function makeGetPictureData(
     ? require('./processor/client').makeGetPictureData(conf, confRef)
     : require('./core').makeGetPictureData(conf);
 }
+
+export const waitImage: WaitImage =
+  typeof window === 'undefined'
+    ? require('./processor/client').waitImage
+    : () => Promise.reject();

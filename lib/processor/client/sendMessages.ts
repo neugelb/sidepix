@@ -1,7 +1,7 @@
 import { PictureProps, ValueReference } from '../../core';
 import ipc from 'node-ipc';
 import { launchServerProcess } from './launchServerProcess';
-import { IpcServerMessages } from '../server';
+import { IpcServerMessages, WaitImageOptions } from '../server';
 import {
   executeCallbacks,
   executeConditionalCallbacks,
@@ -16,8 +16,9 @@ export type IpcClientMessages = {
     confRef: ValueReference;
     sources: PictureProps['sources'];
   };
-  waitImageReady: {
+  waitImage: {
     filePath: string;
+    options?: WaitImageOptions;
   };
   waitQueueEmpty: {};
   quit: {};
@@ -82,8 +83,11 @@ export function executeQuittingCallbacks() {
   executeCallbacks(quittingCallbacks);
 }
 
-export async function waitImageReady(filePath: string): Promise<void> {
-  await ipcSend('waitImageReady', { filePath });
+export async function waitImage(
+  filePath: string,
+  options?: WaitImageOptions,
+): Promise<void> {
+  await ipcSend('waitImage', { filePath, options });
   return new Promise((res, rej) =>
     imageReadyCallbacks.push((msg) => {
       if (msg.filePath === filePath) {

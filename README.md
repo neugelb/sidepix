@@ -13,6 +13,7 @@
 - Fast streaming processing
 - Supports third-party image optimization services
 - UI library- and framework-agnostic
+- Support Server Side Rendering (SSR) and Static Site Generation (SSG)
 - React component included
 - Works well with next/image
 

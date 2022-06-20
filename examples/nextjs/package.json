@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "build-conf": "tsc src/components/PictureConf.ts --outDir conf",
-    "dev": "yarn build-conf && next dev",
-    "build": "yarn build-conf && next build",
-    "start": "next start",
+    "build-custom-server": "tsc server.ts --esModuleInterop true --outDir .",
+    "dev": "yarn build-conf && yarn build-custom-server && node server.js",
+    "build": "yarn build-conf && yarn build-custom-server && next build && sidepix-wait",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
-    "export": "yarn clean && yarn build && sidepix-wait && next export",
+    "export": "yarn clean && yarn build && next export",
     "serve": "yarn http-server out",
-    "clean": "shx rm -rf .next image-cache/* public/media/* conf out"
+    "clean": "shx rm -rf .next image-cache/* public/media/* conf server.js out"
   },
   "dependencies": {
     "next": "12.1.6",

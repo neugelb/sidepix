@@ -1,10 +1,10 @@
 import { promises } from 'fs';
 import { isObjectLike } from '../../core';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import values from 'lodash/values';
 import { executeCallbacks, executeConditionalCallbacks } from '../utils';
 
-export type ImageStatus = 'processing' | 'ready' | 'absent';
+export type ImageStatus = 'queued' | 'processing' | 'ready' | 'absent';
 
 type ImageRecord = {
   status: ImageStatus;
@@ -42,7 +42,7 @@ async function prefillRegistry(directory: string): Promise<void> {
     const readyFiles = files.filter((file) => !file.endsWith('.temp'));
     readyFiles.forEach(
       (file) =>
-        (registry[file] = {
+        (registry[join(directory, file)] = {
           status: 'ready',
           readyCallbacks: [],
           removedCallbacks: [],
@@ -59,7 +59,15 @@ function createImageRecord(status: ImageStatus): ImageRecord {
   };
 }
 
-export async function processingImageStarted(imagePath: string) {
+export function imageQueued(imagePath: string): void {
+  const record = registry[imagePath];
+
+  if (record === undefined) {
+    registry[imagePath] = createImageRecord('queued');
+  }
+}
+
+export async function processingImageStarted(imagePath: string): Promise<void> {
   await prefillRegistry(dirname(imagePath));
 
   const record = registry[imagePath];
@@ -67,7 +75,7 @@ export async function processingImageStarted(imagePath: string) {
   if (record === undefined) {
     registry[imagePath] = createImageRecord('processing');
   } else {
-    if (record.status === 'absent') {
+    if (record.status === 'queued') {
       record.status = 'processing';
     } else {
       throw new ImageStatusConflictError(registry[imagePath].status);
@@ -101,12 +109,14 @@ export async function imageRemoved(imagePath: string) {
 }
 
 export async function waitUntilReady(imagePath: string): Promise<void> {
+  await prefillRegistry(dirname(imagePath));
+
   return new Promise(async (res, rej) => {
     if (registry[imagePath]?.status === 'ready') {
       res();
     } else {
       if (registry[imagePath] === undefined) {
-        registry[imagePath] = createImageRecord('absent');
+        return rej();
       }
       registry[imagePath].readyCallbacks.push(() => {
         res();

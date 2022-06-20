@@ -25,7 +25,7 @@ $ yarn dev
 
 sidepix's optimization server needs to import a `PictureConf` object at runtime, so we have to compile it separately from Next.js's bundles.
 
-In `package.json`:
+Add a `build-conf` script to `package.json`:
 ```json
 "build-conf": "tsc src/components/PictureConf.ts --outDir conf",
 "build": "yarn build-conf && next build",
@@ -47,7 +47,25 @@ webpack: (config, { defaultLoaders }) => {
 
 ### Wait for optimization jobs to complete before exporting
 
-In `package.json`:
+Call `sidepix-wait` after `next build`:
 ```json
-"export": "yarn build && sidepix-wait && next export",
+"build": "yarn build-conf && next build && sidepix-wait",
+```
+
+### Handle SSR
+
+In a [custom server](https://nextjs.org/docs/advanced-features/custom-server) `server.ts`:
+
+```typescript
+if (pathname?.startsWith('/media/')) {
+  await waitImage('public' + pathname);
+}
+
+await handle(req, res, parsedUrl);
+```
+
+Call the custom server instead of `next dev` or `next start`:
+```json
+"dev": "yarn build-conf && yarn build-custom-server && node server.js",
+"start": "NODE_ENV=production node server.js",
 ```

@@ -6,13 +6,13 @@ const Home: NextPage = () => {
   return (
     <div>
       <Head>
-        <title>sidepix Next.js SSG example</title>
+        <title>sidepix Next.js example</title>
         <meta name="description" content="<picture>" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       <main>
-        <h1>sidepix Next.js SSG example</h1>
+        <h1>sidepix Next.js example</h1>
 
         <h2>One source, different aspect ratios:</h2>
 
@@ -56,7 +56,7 @@ const Home: NextPage = () => {
         <Picture
           sources={{
             '(min-width: 840px)': {
-              src: 'pexels-andré-ulysses-de-salis-8199932.jpg',
+              src: 'pexels-andre-ulysses-de-salis-8199932.jpg',
               aspectRatio: 2,
               focalPoint: [0.45, 0.13],
               widths: [800, 1200],

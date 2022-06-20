@@ -17,6 +17,7 @@ yalc.lock
 # production
 /build
 /conf
+server.js
 
 # misc
 .DS_Store

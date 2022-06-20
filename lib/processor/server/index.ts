@@ -4,3 +4,4 @@ export * from './registry';
 export * from './sendMessages';
 export * from './ServerError';
 export * from './streamUtils';
+export { WaitImageOptions } from './waitImage';

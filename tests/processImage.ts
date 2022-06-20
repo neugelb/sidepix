@@ -7,7 +7,7 @@ import { tempFileSuffix } from '../lib/processor';
 import _ from 'lodash';
 import { confRef, confRefTruncate, recreateWorkingDirs } from './utils';
 import { pictureConf } from './pictureConf';
-import { waitImageReady } from '../lib/processor/client/sendMessages';
+import { waitImage } from '../lib/processor/client/sendMessages';
 
 const completeJpeg = 'pexels-carlos-spitzer-17811.jpg';
 const truncatedJpeg = 'pexels-carlos-spitzer-17811-TRUNCATED.jpg';
@@ -40,7 +40,7 @@ test('Process image', async (t) => {
 
   const targetFiles = getProcessedFilePaths(pictureConf, sources);
 
-  await Promise.all(targetFiles.map((file) => waitImageReady(file)));
+  await Promise.all(targetFiles.map((file) => waitImage(file)));
 
   const allFiles = (await promises.readdir(processedDir)).map((file) =>
     join(processedDir, file),
@@ -80,7 +80,7 @@ test('Process cached truncated image', async (t) => {
   const targetFiles = getProcessedFilePaths(pictureConf, sources);
   const targetTempFiles = targetFiles.map((f) => f + tempFileSuffix);
 
-  await Promise.allSettled(targetFiles.map((f) => waitImageReady(f)));
+  await Promise.allSettled(targetFiles.map((f) => waitImage(f)));
 
   const allFiles = (await promises.readdir(processedDir)).map((file) =>
     join(processedDir, file),
@@ -119,7 +119,7 @@ test('Process image truncated at download', async (t) => {
   const targetFiles = getProcessedFilePaths(pictureConf, sources);
   const targetTempFiles = targetFiles.map((f) => f + tempFileSuffix);
 
-  await Promise.allSettled(targetFiles.map((file) => waitImageReady(file)));
+  await Promise.allSettled(targetFiles.map((file) => waitImage(file)));
 
   const allFiles = (await promises.readdir(processedDir)).map((file) =>
     join(processedDir, file),
@@ -148,7 +148,7 @@ test('Process GIF', async (t) => {
 
   const targetFiles = getProcessedFilePaths(pictureConf, sources);
 
-  await Promise.allSettled(targetFiles.map((file) => waitImageReady(file)));
+  await Promise.allSettled(targetFiles.map((file) => waitImage(file)));
 
   const allFiles = (await promises.readdir(processedDir)).map((file) =>
     join(processedDir, file),

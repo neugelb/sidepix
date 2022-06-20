@@ -12,10 +12,11 @@ import { addToQueue } from './processingQueue';
 import { directWrite } from './filesystem';
 import { clones, connect, isUpstreamError, zip } from './streamUtils';
 import values from 'lodash/values';
+import keys from 'lodash/keys';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import isEmpty from 'lodash/isEmpty';
-import { imageRemoved } from './registry';
+import { imageQueued, imageRemoved } from './registry';
 
 function getCropValues(
   originalImageMetadata: Metadata,
@@ -71,7 +72,9 @@ export async function processImage(
     (source) => source.src,
   );
 
-  for (const src in groupedSources) {
+  keys(groupedSources).forEach(async (src) => {
+    queueImagesFromSource(conf, sources, src);
+
     const sharpStream = sharp(); // sharp options maybe configurable?
     sharpStream.on('error', removeImagesFromSource(conf, sources, src));
     addToQueue(conf, src, sharpStream);
@@ -79,7 +82,7 @@ export async function processImage(
     try {
       metadata = await sharpStream.metadata();
     } catch (err) {
-      removeImagesFromSource(conf, sources, src);
+      removeImagesFromSource(conf, sources, src)(err);
       sharpStream.destroy();
       return;
     }
@@ -175,7 +178,17 @@ export async function processImage(
       );
       connect(converted, writeStream);
     }
-  }
+  });
+}
+
+function queueImagesFromSource(
+  conf: ServerSideConf,
+  sources: PictureProps['sources'],
+  src: string,
+) {
+  getProcessedFilePaths(conf, sources, src).forEach((filePath) => {
+    imageQueued(filePath);
+  });
 }
 
 function removeImagesFromSource(

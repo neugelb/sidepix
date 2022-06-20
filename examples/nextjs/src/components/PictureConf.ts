@@ -25,7 +25,7 @@ const fetch: FetchImage =
 */
 
 export const pictureConf: ServerSideConf = {
-  assetsBaseUrl: 'media',
+  assetsBaseUrl: '/media',
   serverSideProcessor: {
     fetch,
     originalDir: 'image-cache',
@@ -61,7 +61,7 @@ export const createFileName: CreateFileName = ({ src, width }) => {
 };
 
 export const imageConf: ServerSideConf = {
-  assetsBaseUrl: 'media',
+  assetsBaseUrl: '/media',
   createFileName,
   serverSideProcessor: {
     fetch,
