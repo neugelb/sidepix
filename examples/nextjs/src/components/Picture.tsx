@@ -1,9 +1,11 @@
-import { resolve } from 'path';
 import { makePicture } from 'sidepix/react';
 import { pictureConf } from './PictureConf';
 
 const pictureConfRef = {
-  filePath: resolve(__dirname, '../../../conf/PictureConf'),
+  filePath:
+    typeof window === 'undefined'
+      ? require('path').resolve(__dirname, '../../../conf/PictureConf')
+      : '',
   name: 'pictureConf',
 };
 
