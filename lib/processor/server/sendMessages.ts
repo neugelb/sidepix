@@ -7,6 +7,9 @@ export type IpcServerMessages = {
     status: ImageStatus;
   };
   queueEmpty: {};
+  criticalError: {
+    message: string;
+  };
 };
 
 export type Socket = Parameters<typeof ipc.server.emit>[0];
@@ -28,4 +31,8 @@ export function imageStatusUpdate(
 
 export function queueEmpty(socket: Socket) {
   ipcSend(socket, 'queueEmpty', {});
+}
+
+export function criticalError(socket: Socket, error: Error) {
+  ipcSend(socket, 'criticalError', { message: error.message });
 }

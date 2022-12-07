@@ -5,8 +5,9 @@ import { processImage } from './processImage';
 import { ServerSideConf, ValueReference } from '../../core';
 import { requireValue } from '../utils';
 import { waitUntilAllReady } from './registry';
-import { imageStatusUpdate, queueEmpty } from './sendMessages';
+import { criticalError, imageStatusUpdate, queueEmpty } from './sendMessages';
 import { waitImage } from './waitImage';
+import { promises } from 'fs';
 
 export function ipcReceiveRequest<
   ActionT extends keyof IpcClientMessages,
@@ -29,8 +30,17 @@ function loadConf(confRef: ValueReference): ServerSideConf {
 }
 
 export function ipcHandleRequests() {
-  ipcReceiveRequest('processImage', ({ confRef, sources }) => {
+  ipcReceiveRequest('processImage', ({ confRef, sources }, socket) => {
     const conf = loadConf(confRef);
+
+    promises
+      .stat(conf.serverSideProcessor.originalDir)
+      .catch((err) => criticalError(socket, err));
+
+    promises
+      .stat(conf.serverSideProcessor.processedDir)
+      .catch((err) => criticalError(socket, err));
+
     processImage(conf, sources);
   });
 

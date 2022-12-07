@@ -56,7 +56,12 @@ export function connectToImageProcessor(): Promise<void> {
         ipcReceive('imageReady', (args) =>
           executeConditionalCallbacks(imageReadyCallbacks, args),
         );
+
         ipcReceive('queueEmpty', () => executeCallbacks(queueEmptyCallbacks));
+
+        ipcReceive('criticalError', ({ message }) =>
+          console.error(`sidepix critical error: ${message}`),
+        );
       });
     });
   } else {

@@ -76,7 +76,7 @@ export async function connect(
 }
 
 export function makeDestroyedStream(error: Error): Duplex {
-  const stream = new Duplex();
+  const stream = new PassThrough();
   // delay to give a change to catch error
   setTimeout(() => stream.destroy(error), 0);
   return stream;

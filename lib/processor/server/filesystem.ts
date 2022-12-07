@@ -11,7 +11,7 @@ import {
   processingImageStarted,
   waitUntilReady,
 } from './registry';
-import { ipcChannelId } from '../utils';
+import { ipcChannelId, isSystemError } from '../utils';
 
 export const tempFileSuffix = `.${ipcChannelId}.temp`;
 
@@ -90,6 +90,9 @@ async function fetchCachedAsync(
           await waitUntilReady(finalPath);
           return await createReadStreamAsync(path);
       }
+    }
+    if (isSystemError(err)) {
+      return makeDestroyedStream(err);
     }
     throw err;
   }
