@@ -1,23 +1,30 @@
 import { FetchImage } from '.';
-import { Duplex } from 'stream';
-import { get } from 'https';
+import { PassThrough } from 'stream';
+import { get as httpsGet, RequestOptions } from 'https';
+import { get as httpGet } from 'http';
+
 import { connect } from '../processor/server/streamUtils';
 
-export const fetchUrl: FetchImage = (url) => {
-  const stream = new Duplex();
+export const makeFetchUrl = (options: RequestOptions = {}): FetchImage => {
+  return (url) => {
+    const stream = new PassThrough();
 
-  get(url, (res) => {
-    if (res.statusCode !== 200) {
-      stream.destroy(
-        Error(
-          `Error while fetching ${url}: status code ${String(res.statusCode)}`,
-        ),
-      );
-    }
-    connect(res, stream);
-  }).on('error', (err) => {
-    stream.destroy(Error(`Error while fetching ${url}: ${String(err)}`));
-  });
+    const get = url.startsWith('https') ? httpsGet : httpGet;
 
-  return stream;
+    get(url, options, (res) => {
+      if (res.statusCode !== 200) {
+        stream.destroy(
+          Error(
+            `Error fetching ${url}: ${res.statusCode} - ${res.statusMessage}`,
+          ),
+        );
+      } else {
+        connect(res, stream);
+      }
+    });
+
+    return stream;
+  };
 };
+
+export const fetchUrl = makeFetchUrl();
