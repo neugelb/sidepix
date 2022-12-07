@@ -1,3 +1,4 @@
+import { join } from 'path';
 import {
   ServerSideConf,
   ImageFormat,
@@ -11,7 +12,7 @@ const fetch: FetchImage =
   typeof window === 'undefined'
     ? (src) => {
         const { createReadStream } = require('fs');
-        return createReadStream(`../../tests/assets/${src}`);
+        return createReadStream(join(__dirname, '../../../tests/assets/', src));
       }
     : () => {};
 

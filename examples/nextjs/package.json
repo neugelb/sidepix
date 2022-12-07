@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build-conf": "tsc src/components/PictureConf.ts --outDir conf",
+    "build-conf": "tsc --skipLibCheck src/components/PictureConf.ts --outDir conf",
     "build-custom-server": "tsc server.ts --esModuleInterop true --outDir .",
     "dev": "yarn build-conf && yarn build-custom-server && node server.js",
     "build": "yarn build-conf && yarn build-custom-server && next build && sidepix-wait",

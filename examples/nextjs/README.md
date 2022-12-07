@@ -27,7 +27,7 @@ sidepix's optimization server needs to import a `PictureConf` object at runtime,
 
 Add a `build-conf` script to `package.json`:
 ```json
-"build-conf": "tsc src/components/PictureConf.ts --outDir conf",
+"build-conf": "tsc --skipLibCheck src/components/PictureConf.ts --outDir conf",
 "build": "yarn build-conf && next build",
 ```
 
