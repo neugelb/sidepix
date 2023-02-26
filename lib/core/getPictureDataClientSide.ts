@@ -56,6 +56,7 @@ export function makeGetPictureData(
     );
 
     return {
+      className: props.className,
       sources: processedSources,
       fallback: createFileUrl(fallback),
       alt: props.alt,
