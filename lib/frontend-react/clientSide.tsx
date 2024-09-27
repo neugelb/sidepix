@@ -17,8 +17,8 @@ const defaultRenderPicture = ({
   img,
 }: PictureElementProps) => (
   <picture className={className}>
-    {sources.map((source) => (
-      <source key={source.media ?? 'default'} {...source} />
+    {sources.map((source, index) => (
+      <source key={`${source.media ?? 'default'}-${index}`} {...source} />
     ))}
     <img {...img} />
   </picture>
